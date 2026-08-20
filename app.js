@@ -62,9 +62,12 @@ function bounds(){
   return {min,max:Math.max(min+0.5,max)};
 }
 function tierForHours(v){
-  for(const t of state.tiers){const r=parseTime(t.time);if(v>=r.min&&v<=r.max)return t;}
-  for(let i=state.tiers.length-1;i>=0;i--){if(v>=parseTime(state.tiers[i].time).min)return state.tiers[i];}
-  return state.tiers[0]||null;
+  let match=null,matchMin=-Infinity;
+  for(const t of state.tiers){
+    const r=parseTime(t.time);
+    if(v>=r.min && r.min>=matchMin){match=t;matchMin=r.min;}
+  }
+  return match||state.tiers[0]||null;
 }
 function esc(v){
   return String(v??"").replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
@@ -223,8 +226,8 @@ function makeHtml(){
 const DATA_URL='PASTE_PUBLIC_XLSX_URL_HERE',LOCALE=${JSON.stringify(state.locale)},CURRENCY=${JSON.stringify(state.currency)};
 let TIERS=${JSON.stringify(state.tiers)},BENEFITS=${JSON.stringify(state.benefits.filter(Boolean))};
 const root=document.currentScript.closest('.prov-calc'),range=root.querySelector('.prov-calc__range'),minus=root.querySelector('[data-step="minus"]'),plus=root.querySelector('[data-step="plus"]'),clients=root.querySelector('[data-clients]'),hours=root.querySelector('[data-hours]'),commission=root.querySelector('[data-commission]'),top=root.querySelector('[data-top]'),label=root.querySelector('[data-client-label]'),benefits=root.querySelector('[data-benefits]');
-function parse(s){const n=String(s||'').match(/\\d+(?:[.,]\\d+)?/g)?.map(x=>Number(x.replace(',','.')))||[];if(!n.length)return{min:0,max:0};if(/[+]|more than|above|over|powyżej|peste|felett|více než/i.test(s))return{min:n[0],max:n[0]};return n.length>1?{min:n[0],max:n[1]}:{min:n[0],max:n[0]};}
-function tier(v){for(const t of TIERS){const r=parse(t.time);if(v>=r.min&&v<=r.max)return t}for(let i=TIERS.length-1;i>=0;i--){if(v>=parse(TIERS[i].time).min)return TIERS[i]}return TIERS[0]}
+function parse(s){const n=String(s||'').match(/\\d+(?:[.,]\\d+)?/g)?.map(x=>Number(x.replace(',','.')))||[];if(!n.length)return{min:0,max:0};if(/[+]|more than|above|over|powyżej|peste|felett|více než/i.test(s))return{min:n[0],max:Infinity};return n.length>1?{min:n[0],max:n[1]}:{min:n[0],max:n[0]};}
+function tier(v){let match=null,matchMin=-Infinity;for(const t of TIERS){const r=parse(t.time);if(v>=r.min&&r.min>=matchMin){match=t;matchMin=r.min}}return match||TIERS[0]}
 function money(v){try{return new Intl.NumberFormat(LOCALE,{style:'currency',currency:CURRENCY,maximumFractionDigits:0}).format(+v||0)}catch{return(+v||0).toLocaleString(LOCALE)+' '+CURRENCY}}
 function fmt(v){return Number.isInteger(+v)?String(v):String(v).replace('.',',')}
 function fitStatValue(el){
@@ -236,7 +239,7 @@ function fitStatValue(el){
 }
 function fitStatValues(){fitStatValue(hours);fitStatValue(clients)}
 function update(){const v=+range.value,t=tier(v),pct=((v-+range.min)/(+range.max-+range.min))*100;clients.textContent=t?.range||'';hours.textContent=t?.time||fmt(v)+' h/week';label.textContent=t?.time||'';commission.textContent=money(t?.commission);top.textContent=money(t?.top);benefits.innerHTML='';BENEFITS.forEach(x=>{const d=document.createElement('div');d.className='prov-calc__feature';d.innerHTML='<span></span>';d.appendChild(document.createTextNode(x));benefits.appendChild(d)});fitStatValues();range.style.background='linear-gradient(90deg,#1ea7e1 0%,#1ea7e1 '+pct+'%,#d9e2ea '+pct+'%,#d9e2ea 100%)'}
-function load(){if(!DATA_URL||DATA_URL.indexOf('PASTE_')===0){update();return}fetch(DATA_URL,{cache:'no-store'}).then(r=>r.arrayBuffer()).then(b=>{const wb=XLSX.read(new Uint8Array(b),{type:'array'});if(wb.Sheets.Tiers){const rows=XLSX.utils.sheet_to_json(wb.Sheets.Tiers,{header:1,blankrows:false});const x=rows.slice(1).filter(r=>r?.[0]!==undefined&&r?.[0]!=='').map(r=>({range:String(r[0]||''),time:String(r[1]||''),commission:+r[2]||0,top:+r[3]||0}));if(x.length)TIERS=x}if(wb.Sheets.Benefits){const rows=XLSX.utils.sheet_to_json(wb.Sheets.Benefits,{header:1,blankrows:false});const x=rows.slice(1).map(r=>String(r?.[0]||'').trim()).filter(Boolean);if(x.length)BENEFITS=x}const rs=TIERS.map(t=>parse(t.time)).filter(x=>x.min!==undefined);range.min=Math.min(...rs.map(x=>x.min));range.max=Math.max(...rs.map(x=>x.max));range.value=range.min;update()}).catch(e=>{console.error('[Prov Calculator] XLSX load failed',e);update()})}
+function load(){if(!DATA_URL||DATA_URL.indexOf('PASTE_')===0){update();return}fetch(DATA_URL,{cache:'no-store'}).then(r=>r.arrayBuffer()).then(b=>{const wb=XLSX.read(new Uint8Array(b),{type:'array'});if(wb.Sheets.Tiers){const rows=XLSX.utils.sheet_to_json(wb.Sheets.Tiers,{header:1,blankrows:false});const x=rows.slice(1).filter(r=>r?.[0]!==undefined&&r?.[0]!=='').map(r=>({range:String(r[0]||''),time:String(r[1]||''),commission:+r[2]||0,top:+r[3]||0}));if(x.length)TIERS=x}if(wb.Sheets.Benefits){const rows=XLSX.utils.sheet_to_json(wb.Sheets.Benefits,{header:1,blankrows:false});const x=rows.slice(1).map(r=>String(r?.[0]||'').trim()).filter(Boolean);if(x.length)BENEFITS=x}const rs=TIERS.map(t=>parse(t.time)).filter(x=>Number.isFinite(x.min));range.min=Math.min(...rs.map(x=>x.min));range.max=Math.max(...rs.map(x=>Number.isFinite(x.max)?x.max:x.min));range.value=range.min;update()}).catch(e=>{console.error('[Prov Calculator] XLSX load failed',e);update()})}
 minus.onclick=()=>{range.value=Math.max(+range.min,+range.value-0.5);update()};plus.onclick=()=>{range.value=Math.min(+range.max,+range.value+0.5);update()};range.oninput=update;
 if(window.ResizeObserver){new ResizeObserver(()=>fitStatValues()).observe(root.querySelector('.prov-calc__stats'))}
 update();load();

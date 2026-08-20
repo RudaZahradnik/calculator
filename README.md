@@ -253,3 +253,11 @@ The calculator now uses the minimum value defined in each tier's `Weekly time` f
 - 37.5+ → tier 4
 
 The visible minimum/maximum labels under the slider remain purely display text and cannot affect tier selection.
+
+## Version 27 fix
+
+The generated HTML now contains the corrected tier-selection logic as well as the generator preview logic.
+
+Important: the slider endpoint labels are display-only. They do not determine which tier is active. The tier is selected from the minimum value in each tier's **Weekly time** field.
+
+The generated HTML also handles an open-ended final tier such as `37.5+` correctly.
