@@ -291,3 +291,32 @@ Example:
 - 37.5 → Tier 4
 
 Slider endpoint labels remain display-only and do not affect any of this logic.
+
+## Version 31
+
+Fixed the highest-tier boundary. The final tier is now activated when the slider reaches its exact minimum value.
+
+For the four-tier example:
+- 15.0 → Tier 1
+- 15.5–24.5 → Tier 2
+- 25.0 → Tier 2
+- 25.5–37.0 → Tier 3
+- 37.5 → Tier 4
+
+This avoids losing either endpoint while keeping intermediate shared boundaries predictable.
+
+## Version 32
+
+Slider architecture changed to a tier-index model.
+
+The slider is now completely independent of the numeric values in `Weekly time`:
+- 1 tier = 1 slider position
+- 4 tiers = 4 slider positions
+- 7 tiers = 7 slider positions
+- any number of tiers is supported
+
+The slider selects a tier by index. The tier itself supplies client volume, weekly time, commission and Top Performer values.
+
+The two endpoint labels under the slider remain presentation-only and are independently editable. They do not affect the number of slider positions or tier selection.
+
+This removes all ambiguity around overlapping ranges such as `15 h/week` and `15–25 h/week`, and around open-ended values such as `37.5+ h/week`.
