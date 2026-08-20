@@ -1,5 +1,13 @@
 # Provident Calculator Generator
 
+## Version 15
+
+The Teamtailor heading-font rule is now part of the actual exported CSS template in `app.js`, so every newly generated CSS file includes it automatically. The generator preview CSS also contains the same rule.
+
+## Version 14
+
+Generated calculator CSS now keeps Nunito for body and UI text while allowing the main calculator headings to inherit the Teamtailor heading font through `--company-header-font-family`. If the Teamtailor variable is unavailable, the headings fall back to Nunito.
+
 ## Version 13
 
 The editor and preview now use a true 50/50 split inside the available workspace width, with a fixed 32px column gap. The previous fixed 520px + 960px columns overflowed because they did not account for the workspace padding, which caused the preview to overlap the editor. Both columns now use `minmax(0, 1fr)` and `width: 100%` so they cannot overflow their grid tracks.

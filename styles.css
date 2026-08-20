@@ -175,3 +175,10 @@
 }
 
 .editor-column{width:100%;max-width:100%;min-width:0}
+
+/* Teamtailor typography */
+
+.prov-calc__title,
+.prov-calc__result-title {
+  font-family: var(--company-header-font-family, 'Nunito'), 'Nunito', Arial, sans-serif;
+}
