@@ -186,3 +186,27 @@ Check the CTA URL in the generator and in the generated HTML.
 `Generator → translate and configure market → enter approved data → preview → Generate package → upload XLSX to Sanity → add XLSX URL to HTML → paste HTML + CSS into Teamtailor → test → publish`
 
 Local market teams should normally only need the Generator and the XLSX. They should not need to edit JavaScript or CSS.
+
+
+## Version 16
+
+The calculator now uses weekly time commitment as the slider metric. Tier matching is based on the `Weekly time` column in the XLSX, while the client-volume range is displayed as supporting information. Benefits are displayed in a dedicated box on the left side, below the slider statistics. The result card keeps commission, top performer and CTA on the right.
+
+
+## Version 17
+
+Fixed the slider data source so the slider range and tier matching are calculated from the `Weekly time` column. This is the hours-per-week version shown in the reference design.
+
+
+## Version 18
+
+The slider endpoint labels are now explicitly readable. Benefits have been moved to the left column directly below the disclaimer in both the generator preview and the exported calculator. The benefits heading is also editable in Content & translations.
+
+
+## Version 19
+
+The result card no longer stretches to match the taller left column. It now sizes to its own content, leaving balanced padding below the CTA instead of an empty extended area.
+
+## Version 20
+
+Added a subtle CTA hover animation. The button gently lifts, gets a soft shadow and slightly increases brightness on hover, then returns to its normal position on click. The same animation is included in the generator preview and every exported calculator CSS file.
