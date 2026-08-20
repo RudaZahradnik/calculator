@@ -261,3 +261,14 @@ The generated HTML now contains the corrected tier-selection logic as well as th
 Important: the slider endpoint labels are display-only. They do not determine which tier is active. The tier is selected from the minimum value in each tier's **Weekly time** field.
 
 The generated HTML also handles an open-ended final tier such as `37.5+` correctly.
+
+## Version 28 final correction
+
+The previous V28 build still contained an older range parser in the generator. This has now been corrected as well.
+
+The slider is **not** generated from the text labels below it. It is generated from the tier data:
+- each tier's `Weekly time` minimum creates a slider boundary
+- the final `+` tier uses its minimum as the final slider position
+- labels below the slider are display-only
+
+Therefore four tiers produce four logical tier states, with the last tier active at the final position.
