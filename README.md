@@ -210,3 +210,21 @@ The result card no longer stretches to match the taller left column. It now size
 ## Version 20
 
 Added a subtle CTA hover animation. The button gently lifts, gets a soft shadow and slightly increases brightness on hover, then returns to its normal position on click. The same animation is included in the generator preview and every exported calculator CSS file.
+
+## Version 21
+
+Added editable slider endpoint labels to Content & translations:
+- Slider minimum label
+- Slider maximum label
+
+These labels are independent from the calculated slider limits and are included in exported HTML. Existing configurations receive sensible labels automatically when the fields are missing.
+
+## Slider endpoint labels
+
+The generator now exposes two separate editable fields under **Content & translations**:
+- **Slider minimum label (shown below slider)**
+- **Slider maximum label (shown below slider)**
+
+These are **display labels only**. They are intentionally independent from the actual slider limits, which are calculated automatically from the `Weekly time` values in the commission tiers.
+
+The field formerly labelled **Client question** is now labelled **Time commitment question**, because the slider represents weekly time commitment rather than client count.

@@ -25,9 +25,9 @@ const PRESETS = {
 };
 
 const TEXT_FIELDS = [
-  ["title","Headline",true],["subtitle","Subtitle",true],["client_question","Client question",false],["benefits_title","Benefits heading",false],
+  ["title","Headline",true],["subtitle","Subtitle",true],["client_question","Time commitment question",false],["benefits_title","Benefits heading",false],
   ["badge","Calculation badge",false],["commission_title","Commission title",false],["monthly_commission","Monthly commission label",false],
-  ["clients_label","Number of clients label",false],["time_label","Time commitment label",false],["note","Disclaimer",true],
+  ["clients_label","Number of clients label",false],["time_label","Time commitment label",false],["slider_min_label","Slider minimum label (shown below slider)",false],["slider_max_label","Slider maximum label (shown below slider)",false],["note","Disclaimer",true],
   ["top_performer_label","Top performer label",false],["top_performer_description","Top performer description",false],
   ["cta_text","CTA button text",false],["cta_url","CTA URL",false]
 ];
@@ -141,7 +141,7 @@ function renderPreview(reset=false){
   r.min=b.min;r.max=b.max;r.step=0.5;
   if(reset||+r.value<b.min||+r.value>b.max)r.value=b.min;
   const v=+r.value, tier=tierForHours(v), tr=tier?parseTime(tier.time):null;
-  q("#pScaleMin").textContent=formatHours(b.min);q("#pScaleMax").textContent=`${formatHours(b.max)}+`;
+  q("#pScaleMin").textContent=t.slider_min_label||`${formatHours(b.min)} h`;q("#pScaleMax").textContent=t.slider_max_label||`${formatHours(b.max)}+ h`;
   q("#pClients").textContent=tier?.range||"";
   q("#pTime").textContent=tier?.time||"";
   q("#pClientLabel").textContent=tier?.time||"";
@@ -150,7 +150,7 @@ function renderPreview(reset=false){
   const list=q("#pBenefits");list.innerHTML="";
   state.benefits.filter(Boolean).forEach(x=>{const d=document.createElement("div");d.className="prov-calc__feature";d.innerHTML="<span></span>";d.appendChild(document.createTextNode(x));list.appendChild(d);});
   const c=q("#pCta");c.href=t.cta_url||"#";c.target=t.cta_target||"_blank";
-  q("#sliderInfo").textContent=`Slider: ${formatHours(b.min)}–${formatHours(b.max)} h/week`;q("#activeTierInfo").textContent=tier?`Active tier: ${tier.range}`:"No active tier";
+  q("#sliderInfo").textContent=`Slider limits: ${formatHours(b.min)}–${formatHours(b.max)} h/week · endpoint labels are editable separately`;q("#activeTierInfo").textContent=tier?`Active tier: ${tier.range}`:"No active tier";
   fitPreview();
 }
 function formatHours(v){return Number.isInteger(v)?String(v):String(v).replace(".",",");}
@@ -205,7 +205,7 @@ function makeHtml(){
 <div class="prov-calc__grid">
 <div class="prov-calc__card"><div class="prov-calc__label">${esc(t.client_question)}</div>
 <div class="prov-calc__slider-row"><button class="prov-calc__step" type="button" data-step="minus">−</button><input class="prov-calc__range" type="range" min="${b.min}" max="${b.max}" value="${b.min}" step="0.5"><button class="prov-calc__step" type="button" data-step="plus">+</button></div>
-<div class="prov-calc__scale"><span>${formatHours(b.min)} h</span><span>${formatHours(b.max)}+ h</span></div>
+<div class="prov-calc__scale"><span>${esc(t.slider_min_label||`${formatHours(b.min)} h`)}</span><span>${esc(t.slider_max_label||`${formatHours(b.max)}+ h`)}</span></div>
 <div class="prov-calc__stats">
 <div class="prov-calc__stat"><div class="prov-calc__stat-title">${esc(t.time_label)}</div><div class="prov-calc__stat-value" data-hours></div></div>
 <div class="prov-calc__stat"><div class="prov-calc__stat-title">${esc(t.clients_label)}</div><div class="prov-calc__stat-value" data-clients></div></div>
