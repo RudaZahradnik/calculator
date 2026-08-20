@@ -241,3 +241,15 @@ Added automatic responsive fitting for the two statistic values inside the calcu
 ## Version 25
 
 Fixed open-ended final tiers such as `37.5+ hrs/week`. The final tier is now selected when the slider reaches its minimum value, while the slider itself still ends at that finite value. This prevents the previous tier from incorrectly remaining active at the maximum.
+
+## Version 26
+
+Fixed tier selection so **commission tiers are completely independent of the slider endpoint labels**.
+
+The calculator now uses the minimum value defined in each tier's `Weekly time` field to determine which tier is active. When the slider reaches an exact boundary, the later tier wins. For example:
+- 15 → tier 1
+- 15–25 → tier 2
+- 25–37.5 → tier 3
+- 37.5+ → tier 4
+
+The visible minimum/maximum labels under the slider remain purely display text and cannot affect tier selection.
