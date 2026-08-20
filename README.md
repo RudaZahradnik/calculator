@@ -272,3 +272,9 @@ The slider is **not** generated from the text labels below it. It is generated f
 - labels below the slider are display-only
 
 Therefore four tiers produce four logical tier states, with the last tier active at the final position.
+
+## Version 29
+
+Fixed the lowest slider position. When the first two tiers share the same minimum value (for example `15` and `15–25`), the exact minimum now activates **Tier 1**. Tier 2 becomes active after the first slider step above the minimum.
+
+This keeps the lowest tier visible while preserving all subsequent tier transitions.
