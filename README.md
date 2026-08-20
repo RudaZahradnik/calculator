@@ -233,3 +233,11 @@ The field formerly labelled **Client question** is now labelled **Time commitmen
 ## Version 23
 
 Fixed exported HTML/JS, slider endpoint handling, and time-commitment wording across all market presets.
+
+## Version 24
+
+Added automatic responsive fitting for the two statistic values inside the calculator cards. Long values such as `25–37,5 h/týden` or long client-range labels are kept inside the card's existing padding and automatically reduce their font size when the available width becomes smaller. A ResizeObserver refits them when the calculator changes size.
+
+## Version 25
+
+Fixed open-ended final tiers such as `37.5+ hrs/week`. The final tier is now selected when the slider reaches its minimum value, while the slider itself still ends at that finite value. This prevents the previous tier from incorrectly remaining active at the maximum.
