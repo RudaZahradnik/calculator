@@ -320,3 +320,16 @@ The slider selects a tier by index. The tier itself supplies client volume, week
 The two endpoint labels under the slider remain presentation-only and are independently editable. They do not affect the number of slider positions or tier selection.
 
 This removes all ambiguity around overlapping ranges such as `15 h/week` and `15–25 h/week`, and around open-ended values such as `37.5+ h/week`.
+
+## Version 33
+
+Fixed the generated calculator runtime.
+
+The generated HTML now includes its own `money()`, `fmt()` and responsive stat-value fitting helpers. Previously these helpers were available in the generator itself but were missing from the generated snippet, which caused JavaScript execution to stop before commission and Top Performer values were rendered.
+
+Also:
+- slider movement is now exactly one tier per step
+- preview slider uses whole tier positions
+- commission and Top Performer values render correctly
+- long values in the Time / Client stat boxes automatically reduce their font size to fit while preserving the box padding
+- the stat boxes keep their internal spacing on smaller layouts
