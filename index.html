@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Provident Calculator Generator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="app-header">
+  <div>
+    <div class="eyebrow">PROVIDENT DIGITAL TOOL</div>
+    <h1>Calculator Generator</h1>
+    <p>Create a localised calculator, preview it live, and generate HTML, CSS and XLSX.</p>
+  </div>
+  <div class="header-actions">
+    <button class="button button-secondary" id="importConfigBtn">Import configuration</button>
+    <button class="button button-secondary" id="exportConfigBtn">Export configuration</button>
+    <input id="configFileInput" type="file" accept=".json" hidden>
+  </div>
+</header>
+
+<main class="app-shell">
+<section class="editor">
+
+<div class="panel">
+  <div class="panel-heading">
+    <div><span class="step">01</span><h2>Market &amp; settings</h2></div>
+  </div>
+  <div class="form-grid three">
+    <label>Country
+      <select id="country">
+        <option value="CZ">Czech Republic</option>
+        <option value="EN">United Kingdom / English</option>
+        <option value="PL">Poland</option>
+        <option value="RO">Romania</option>
+        <option value="HU">Hungary</option>
+      </select>
+    </label>
+    <label>Locale<input id="locale"></label>
+    <label>Currency<input id="currency" maxlength="3"></label>
+  </div>
+  <div class="form-grid two">
+    <label>XLSX filename<input id="xlsxFilename"></label>
+    <label>CTA target
+      <select id="ctaTarget">
+        <option value="_blank">Open in new tab</option>
+        <option value="_self">Open in same tab</option>
+      </select>
+    </label>
+  </div>
+</div>
+
+<div class="panel">
+  <div class="panel-heading">
+    <div><span class="step">02</span><h2>Content &amp; translations</h2></div>
+    <span class="hint">Every visible text is editable.</span>
+  </div>
+  <div class="form-grid two" id="textFields"></div>
+</div>
+
+<div class="panel">
+  <div class="panel-heading">
+    <div><span class="step">03</span><h2>Commission tiers</h2></div>
+    <button class="button button-small" id="addTierBtn" type="button">+ Add tier</button>
+  </div>
+  <p class="hint">Add or remove any number of rows. Slider limits are calculated automatically from the client ranges.</p>
+  <div class="tier-table-wrap">
+    <table class="tier-table">
+      <thead><tr><th>Client range</th><th>Time label</th><th>Commission</th><th>Top performer</th><th></th></tr></thead>
+      <tbody id="tiersBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<div class="panel">
+  <div class="panel-heading">
+    <div><span class="step">04</span><h2>Benefits</h2></div>
+    <button class="button button-small" id="addBenefitBtn" type="button">+ Add benefit</button>
+  </div>
+  <div id="benefitsList" class="benefits-editor"></div>
+</div>
+
+<div class="panel output-panel">
+  <div class="panel-heading">
+    <div><span class="step">05</span><h2>Generate</h2></div>
+  </div>
+  <p class="hint">Generate the complete market package. The XLSX remains the data source for the published calculator.</p>
+  <div class="generate-actions">
+    <button class="button button-primary button-large" id="generateBtn" type="button">Generate package</button>
+    <button class="button button-secondary" id="downloadHtmlBtn" type="button">HTML</button>
+    <button class="button button-secondary" id="downloadCssBtn" type="button">CSS</button>
+    <button class="button button-secondary" id="downloadXlsxBtn" type="button">XLSX</button>
+  </div>
+  <div id="status" class="status"></div>
+</div>
+
+</section>
+
+<aside class="preview-column">
+  <div class="preview-header">
+    <div><div class="eyebrow">LIVE PREVIEW</div><h2>Calculator</h2></div>
+    <div class="preview-meta" id="previewMeta"></div>
+  </div>
+  <div class="preview-frame">
+    <div class="preview-scale" id="previewScale">
+      <section class="prov-calc">
+      <div class="prov-calc__wrap">
+        <div class="prov-calc__hero">
+          <h2 class="prov-calc__title" id="pTitle"></h2>
+          <p class="prov-calc__subtitle" id="pSubtitle"></p>
+          <div class="prov-calc__grid">
+            <div class="prov-calc__card">
+              <div class="prov-calc__label" id="pQuestion"></div>
+              <div class="prov-calc__slider-row">
+                <button class="prov-calc__step" id="previewMinus" type="button">−</button>
+                <input class="prov-calc__range" id="previewRange" type="range" min="0" max="100" value="50" step="1">
+                <button class="prov-calc__step" id="previewPlus" type="button">+</button>
+              </div>
+              <div class="prov-calc__scale"><span id="pScaleMin"></span><span id="pScaleMax"></span></div>
+              <div class="prov-calc__stats">
+                <div class="prov-calc__stat"><div class="prov-calc__stat-title" id="pClientsLabel"></div><div class="prov-calc__stat-value" id="pClients"></div></div>
+                <div class="prov-calc__stat"><div class="prov-calc__stat-title" id="pTimeLabel"></div><div class="prov-calc__stat-value" id="pTime"></div></div>
+              </div>
+              <div class="prov-calc__note" id="pNote"></div>
+            </div>
+            <div class="prov-calc__result">
+              <div class="prov-calc__badge" id="pBadge"></div>
+              <div class="prov-calc__result-head"><h3 class="prov-calc__result-title" id="pCommissionTitle"></h3><div class="prov-calc__client-label" id="pClientLabel"></div></div>
+              <div class="prov-calc__amount" id="pCommission"></div>
+              <div class="prov-calc__amount-sub" id="pMonthly"></div>
+              <div class="prov-calc__top-performer">
+                <div class="prov-calc__top-label" id="pTopLabel"></div>
+                <div class="prov-calc__top-amount" id="pTopAmount"></div>
+                <div class="prov-calc__top-description" id="pTopDescription"></div>
+              </div>
+              <div class="prov-calc__features" id="pBenefits"></div>
+              <a class="prov-calc__cta" id="pCta" href="#" target="_blank" rel="noopener"><span id="pCtaText"></span></a>
+            </div>
+          </div>
+        </div>
+      </div>
+      </section>
+    </div>
+  </div>
+  <div class="preview-footer"><span id="sliderInfo"></span><span id="activeTierInfo"></span></div>
+</aside>
+</main>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
