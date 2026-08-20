@@ -228,3 +228,8 @@ The generator now exposes two separate editable fields under **Content & transla
 These are **display labels only**. They are intentionally independent from the actual slider limits, which are calculated automatically from the `Weekly time` values in the commission tiers.
 
 The field formerly labelled **Client question** is now labelled **Time commitment question**, because the slider represents weekly time commitment rather than client count.
+
+
+## Version 23
+
+Fixed exported HTML/JS, slider endpoint handling, and time-commitment wording across all market presets.
