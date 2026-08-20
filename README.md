@@ -278,3 +278,16 @@ Therefore four tiers produce four logical tier states, with the last tier active
 Fixed the lowest slider position. When the first two tiers share the same minimum value (for example `15` and `15–25`), the exact minimum now activates **Tier 1**. Tier 2 becomes active after the first slider step above the minimum.
 
 This keeps the lowest tier visible while preserving all subsequent tier transitions.
+
+## Version 30
+
+Fixed the remaining lowest-tier selection issue. The first tier now explicitly owns the exact minimum slider value. A later tier with the same minimum becomes active only after the slider moves above that minimum.
+
+Example:
+- 15.0 → Tier 1
+- 15.5 → Tier 2
+- 25.0 → Tier 2
+- 25.5 → Tier 3
+- 37.5 → Tier 4
+
+Slider endpoint labels remain display-only and do not affect any of this logic.

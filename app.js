@@ -62,12 +62,15 @@ function bounds(){
   return {min,max:Math.max(min+0.5,max)};
 }
 function tierForHours(v){
-  let match=null,matchMin=-Infinity;
-  for(const t of state.tiers){
-    const r=parseTime(t.time);
-    if(v>=r.min && r.min>=matchMin){match=t;matchMin=r.min;}
+  if(!state.tiers.length)return null;
+  const mins=state.tiers.map(t=>parseTime(t.time).min);
+  if(v<=mins[0])return state.tiers[0];
+  let index=0;
+  for(let i=1;i<state.tiers.length;i++){
+    if(v>mins[i])index=i;
+    else break;
   }
-  return match||state.tiers[0]||null;
+  return state.tiers[index]||state.tiers[0];
 }
 function esc(v){
   return String(v??"").replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
@@ -227,7 +230,7 @@ const DATA_URL='PASTE_PUBLIC_XLSX_URL_HERE',LOCALE=${JSON.stringify(state.locale
 let TIERS=${JSON.stringify(state.tiers)},BENEFITS=${JSON.stringify(state.benefits.filter(Boolean))};
 const root=document.currentScript.closest('.prov-calc'),range=root.querySelector('.prov-calc__range'),minus=root.querySelector('[data-step="minus"]'),plus=root.querySelector('[data-step="plus"]'),clients=root.querySelector('[data-clients]'),hours=root.querySelector('[data-hours]'),commission=root.querySelector('[data-commission]'),top=root.querySelector('[data-top]'),label=root.querySelector('[data-client-label]'),benefits=root.querySelector('[data-benefits]');
 function parse(s){const n=String(s||'').match(/\\d+(?:[.,]\\d+)?/g)?.map(x=>Number(x.replace(',','.')))||[];if(!n.length)return{min:0,max:0,open:false};if(/[+]|more than|above|over|powyżej|peste|felett|více než/i.test(s))return{min:n[0],max:n[0],open:true};return n.length>1?{min:n[0],max:n[1]}:{min:n[0],max:n[0]};}
-function tier(v){let match=null,matchMin=-Infinity;for(const t of TIERS){const r=parse(t.time);if(v>=r.min&&r.min>=matchMin){match=t;matchMin=r.min}}return match||TIERS[0]}
+function tier(v){if(!TIERS.length)return null;const mins=TIERS.map(t=>parse(t.time).min);if(v<=mins[0])return TIERS[0];let index=0;for(let i=1;i<TIERS.length;i++){if(v>mins[i])index=i;else break}return TIERS[index]||TIERS[0]}
 function money(v){try{return new Intl.NumberFormat(LOCALE,{style:'currency',currency:CURRENCY,maximumFractionDigits:0}).format(+v||0)}catch{return(+v||0).toLocaleString(LOCALE)+' '+CURRENCY}}
 function fmt(v){return Number.isInteger(+v)?String(v):String(v).replace('.',',')}
 function fitStatValue(el){
