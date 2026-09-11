@@ -333,3 +333,11 @@ Also:
 - commission and Top Performer values render correctly
 - long values in the Time / Client stat boxes automatically reduce their font size to fit while preserving the box padding
 - the stat boxes keep their internal spacing on smaller layouts
+
+## Version 34
+
+Added a Desktop / Mobile switch to Live Preview.
+
+- Desktop shows the full-width calculator at its 1180px design width and scales it to fit the preview area.
+- Mobile renders the calculator using a 390px mobile layout and the same responsive rules used by the published calculator.
+- The switch affects preview only. It does not change the generated HTML/CSS.
