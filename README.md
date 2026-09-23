@@ -341,3 +341,63 @@ Added a Desktop / Mobile switch to Live Preview.
 - Desktop shows the full-width calculator at its 1180px design width and scales it to fit the preview area.
 - Mobile renders the calculator using a 390px mobile layout and the same responsive rules used by the published calculator.
 - The switch affects preview only. It does not change the generated HTML/CSS.
+
+## Version 35 - Provident Design System
+
+The calculator keeps the same functionality and data logic, but its visual styling now follows the supplied Provident design-system references.
+
+- Primary blue: `#0063E8`
+- Primary black: `#1A1A1A`
+- White 600 border: `#D3D3D3`
+- White 1000 text: `#747476`
+- 10px corner radius
+- Teamtailor/company heading font for headings when available
+- Nunito for general calculator text
+- Blue slider and primary button states
+- Green retained as an accent for the indicative badge and top-performer amount
+- Reduced shadows
+- Desktop/Mobile Live Preview remains available
+
+## Typography / branding font
+
+The generator package includes `Branding-Semibold.otf`.
+
+- The **local Generator UI preview** loads this font locally and uses it for calculator headings.
+- **Nunito** is loaded from Google Fonts for general calculator text.
+- The **generated Teamtailor/CMS calculator does not embed the Branding font**. Its headings use `var(--company-header-font-family, 'Nunito')`, allowing Teamtailor's existing brand heading font to be inherited automatically.
+- General calculator text uses Nunito.
+- Keep `Branding-Semibold.otf` in the same folder as `index.html` when running the generator locally.
+
+## Version 37 - Redesign podle layoutů 1440 px a 375 px
+
+Vzhled kalkulačky byl kompletně přestavěn podle nových návrhů (Layout 1440–1024 px a Layout 639–375 px). Datová logika (tiery, XLSX, slider po jednotlivých tierech) zůstává stejná.
+
+**Desktop**
+- Jeden rámeček se šedým okrajem (#D3D3D3, radius 10 px), vlevo otázka, slider a statistiky jako řádky „label – hodnota“, pod nimi disclaimer.
+- Vpravo karta „Commission estimate“ se zeleným štítkem nad pravým horním rohem, řádek měsíční provize + Top performer vedle sebe, benefity s modrými checkmark ikonami uvnitř karty a CTA jako pill tlačítko (50 px, Provident primary blue).
+
+**Mobil**
+- Oddělovací linka pod podtitulkem, bez vnějšího rámečku.
+- Karta s provizí je hned pod statistikami (CTA už není až po dvou scrollech), disclaimer pod kartou a „What else you get“ se seznamem benefitů na konci.
+
+**Technicky**
+- Náhled v generátoru a exportovaný kód používají stejný markup (`calcMarkup`), stejné CSS (`CSS`) i stejný runtime (`provCalcRuntime`), takže náhled přesně odpovídá tomu, co se vloží do Teamtailoru.
+- Přepnutí desktop/mobil je řešeno přes CSS container query (šířka kalkulačky do 799 px = mobilní rozložení), takže se kalkulačka přizpůsobí šířce sloupce v CMS, nejen šířce okna.
+- Tlačítka +/− se na krajích slideru deaktivují; slider má `aria-valuetext`, částky jsou v `aria-live` oblasti.
+- CSS resetuje styl range inputu, aby ho nerozbily globální styly CMS.
+- Top performer popis (`top_performer_description`) se v novém designu nezobrazuje; zůstává v XLSX kvůli kompatibilitě. Nové pole „Benefits heading (mobile)“ je doplněno pro všechny trhy.
+
+## Version 38 - Top performer tooltip
+
+- Popis Top performera (`top_performer_description`) je zpět a zobrazuje se přes ikonu otazníku vedle popisku „Top performer“, podle Provident komponenty Tooltips.
+  - **Desktop:** plain tooltip (bílý box s šedým okrajem) při najetí myší, při fokusu klávesnicí nebo po kliknutí. Zavře se klávesou Esc nebo kliknutím mimo.
+  - **Mobil:** bottom sheet s úchytem, křížkem, nadpisem (= popisek Top performer), textem a tlačítkem pro zavření. Fokus se přesune do sheetu a po zavření se vrátí na ikonu. Zavírá se i klávesou Esc nebo klepnutím na ztmavené pozadí.
+- Pokud je popis prázdný, ikona se nezobrazí.
+- Nová editovatelná pole v Content & translations: **Top performer tooltip text** a **Tooltip close button (mobile)** (CZ „Zavřít“, EN „Close“, PL „Zamknij“, RO „Închide“, HU „Bezárás“).
+- Popisek „Top performer“ je v normálním zápisu a zůstává editovatelný pro každý trh.
+- Formát měny se dál řídí nastavením Locale + Currency daného trhu (např. `cs-CZ` + `CZK` → „9 000 Kč“, `en-GB` + `GBP` → „£300“, `pl-PL` + `PLN` → „2600 zł“).
+
+## Version 39
+
+- Badge „Orientační výpočet“ je protažený směrem dolů a schovaný za kartou (karta má vyšší z-index a bílé pozadí). Zaoblený roh karty tak už nenechává trčet ostrý roh badge; badge a karta působí jako jeden spojený prvek na desktopu i mobilu.
+- Mobilní Live Preview: náhled se už neroztahuje na výšku rámečku, výška se počítá ze skutečné výšky kalkulačky a spodní okraj má volné místo (24 px).

@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="preload" href="Branding-Semibold.otf" as="font" type="font/otf" crossorigin>
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -67,7 +68,7 @@
     <div><span class="step">03</span><h2>Commission tiers</h2></div>
     <button class="button button-small" id="addTierBtn" type="button">+ Add tier</button>
   </div>
-  <p class="hint">Add or remove any number of rows. Slider limits are calculated automatically from the client ranges.</p>
+  <p class="hint">Add or remove any number of rows. The slider has one position per tier, in table order.</p>
   <div class="tier-table-wrap">
     <table class="tier-table">
       <thead><tr><th>Client range</th><th>Time label</th><th>Commission</th><th>Top performer</th><th></th></tr></thead>
@@ -113,46 +114,7 @@
   </div>
   <div class="preview-frame">
     <div class="preview-scale" id="previewScale">
-      <section class="prov-calc">
-      <div class="prov-calc__wrap">
-        <div class="prov-calc__hero">
-          <h2 class="prov-calc__title" id="pTitle"></h2>
-          <p class="prov-calc__subtitle" id="pSubtitle"></p>
-          <div class="prov-calc__grid">
-            <div class="prov-calc__card">
-              <div class="prov-calc__label" id="pQuestion"></div>
-              <div class="prov-calc__slider-row">
-                <button class="prov-calc__step" id="previewMinus" type="button">−</button>
-                <input class="prov-calc__range" id="previewRange" type="range" min="0" max="100" value="50" step="1">
-                <button class="prov-calc__step" id="previewPlus" type="button">+</button>
-              </div>
-              <div class="prov-calc__scale"><span id="pScaleMin"></span><span id="pScaleMax"></span></div>
-              <div class="prov-calc__stats">
-                <div class="prov-calc__stat"><div class="prov-calc__stat-title" id="pClientsLabel"></div><div class="prov-calc__stat-value" id="pClients"></div></div>
-                <div class="prov-calc__stat"><div class="prov-calc__stat-title" id="pTimeLabel"></div><div class="prov-calc__stat-value" id="pTime"></div></div>
-              </div>
-              <div class="prov-calc__note" id="pNote"></div>
-              <div class="prov-calc__benefits">
-                <div class="prov-calc__benefits-title" id="pBenefitsTitle"></div>
-                <div class="prov-calc__features" id="pBenefits"></div>
-              </div>
-            </div>
-            <div class="prov-calc__result">
-              <div class="prov-calc__badge" id="pBadge"></div>
-              <div class="prov-calc__result-head"><h3 class="prov-calc__result-title" id="pCommissionTitle"></h3><div class="prov-calc__client-label" id="pClientLabel"></div></div>
-              <div class="prov-calc__amount" id="pCommission"></div>
-              <div class="prov-calc__amount-sub" id="pMonthly"></div>
-              <div class="prov-calc__top-performer">
-                <div class="prov-calc__top-label" id="pTopLabel"></div>
-                <div class="prov-calc__top-amount" id="pTopAmount"></div>
-                <div class="prov-calc__top-description" id="pTopDescription"></div>
-              </div>
-              <a class="prov-calc__cta" id="pCta" href="#" target="_blank" rel="noopener"><span id="pCtaText"></span></a>
-            </div>
-          </div>
-        </div>
-      </div>
-      </section>
+      <section class="prov-calc" id="previewCalc"></section>
     </div>
   </div>
   <div class="preview-footer"><span id="sliderInfo"></span><span id="activeTierInfo"></span></div>
