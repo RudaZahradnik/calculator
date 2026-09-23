@@ -33,7 +33,61 @@ const TEXT_FIELDS = [
   ["note","Disclaimer",true],["cta_text","CTA button text",false],["cta_url","CTA URL",false]
 ];
 
+/* Provident typography scale (Desktop web / Mobile web).
+   size = desktop px, lh = desktop line-height, m / mlh = mobile. */
+const TYPE_SCALE = {
+  h1:{label:"H1 – Headline Large",font:"heading",size:48,lh:1.00,m:28,mlh:1.08},
+  h2:{label:"H2 – Headline Regular",font:"heading",size:40,lh:1.08,m:24,mlh:1.08},
+  h3:{label:"H3 – Headline Small",font:"heading",size:32,lh:1.08,m:20,mlh:1.20},
+  h4:{label:"H4 – Title Large",font:"heading",size:24,lh:1.08,m:18,mlh:1.12},
+  h5:{label:"H5 – Title Regular",font:"heading",size:20,lh:1.20,m:16,mlh:1.20},
+  h6:{label:"H6 – Title Small",font:"heading",size:18,lh:1.12,m:14,mlh:1.24},
+  b24:{label:"P – Body 24",font:"body",size:24,lh:1.20},
+  b20:{label:"P – Body 20",font:"body",size:20,lh:1.20},
+  b18:{label:"P – Body 18",font:"body",size:18,lh:1.20},
+  b16:{label:"P – Body 16",font:"body",size:16,lh:1.35},
+  b14:{label:"P – Body Small 14",font:"body",size:14,lh:1.38},
+  l12:{label:"P – Label 12",font:"body",size:12,lh:1.28},
+  s11:{label:"P – Supportive text 11",font:"body",size:11,lh:1.28},
+  c14:{label:"P – Small caps 14",font:"body",size:14,lh:1.38,caps:true},
+  c11:{label:"P – Small caps 11",font:"body",size:11,lh:1.28,caps:true}
+};
+const WEIGHTS = [[400,"Regular"],[600,"Semibold"],[700,"Bold"]];
+function isHeading(type){return /^h[1-6]$/.test(type);}
+
+/* Default text styles. "tag" fields change their HTML element (h1–h6 / p);
+   the other fields sit inside fixed elements (buttons, labels, list items),
+   so only their visual style changes. */
+const DEFAULT_STYLES = {
+  title:{type:"h1"}, subtitle:{type:"b16",weight:400}, client_question:{type:"h5"},
+  slider_min_label:{type:"b14",weight:400}, slider_max_label:{type:"b14",weight:400},
+  clients_label:{type:"b16",weight:400}, time_label:{type:"b16",weight:400},
+  badge:{type:"c14",weight:400}, commission_title:{type:"b16",weight:700},
+  monthly_commission:{type:"b16",weight:400}, top_performer_label:{type:"b16",weight:400},
+  top_performer_description:{type:"l12",weight:400}, tooltip_close:{type:"b16",weight:600},
+  benefits_title:{type:"b16",weight:700}, benefits_items:{type:"b14",weight:400},
+  note:{type:"s11",weight:400}, cta_text:{type:"b16",weight:600}
+};
+const TAG_FIELDS = new Set(["title","subtitle","client_question","commission_title","benefits_title","note"]);
+function styleFor(styles,key){
+  const d=DEFAULT_STYLES[key]||{type:"b16",weight:400};
+  const x={...d,...((styles||{})[key]||{})};
+  if(!TYPE_SCALE[x.type])x.type=d.type;
+  if(isHeading(x.type))x.weight=600;
+  else if(![400,600,700].includes(+x.weight))x.weight=400;
+  return x;
+}
+function typeCls(styles,key){
+  const x=styleFor(styles,key);
+  return isHeading(x.type)?`pc-type-${x.type}`:`pc-type-${x.type} pc-w-${x.weight}`;
+}
+function typeTag(styles,key){
+  const x=styleFor(styles,key);
+  return isHeading(x.type)?x.type:"p";
+}
+
 let state = clone(PRESETS.CZ);
+state.styles = clone(DEFAULT_STYLES);
 
 function clone(o){return JSON.parse(JSON.stringify(o));}
 function q(s){return document.querySelector(s);}
@@ -50,9 +104,10 @@ function esc(v){
 /* =========================================================
    Calculator markup - shared by the Live Preview and the export
    ========================================================= */
-function calcMarkup(t){
+function calcMarkup(t,styles){
+  const C=k=>typeCls(styles,k), T=k=>typeTag(styles,k);
   const desc=String(t.top_performer_description||"").trim();
-  const tip=desc?`<span class="prov-calc__tip"><button class="prov-calc__info" type="button" data-tip-trigger aria-label="${esc(t.top_performer_label)}: ${esc(desc)}" aria-expanded="false"><svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><circle cx="10" cy="10" r="8.25" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M7.9 7.7a2.15 2.15 0 1 1 3 2c-.6.3-.9.7-.9 1.3v.4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="10" cy="14.1" r=".95" fill="currentColor"/></svg></button><span class="prov-calc__tooltip" role="tooltip" data-tooltip>${esc(desc)}</span></span>`:"";
+  const tip=desc?`<span class="prov-calc__tip"><button class="prov-calc__info" type="button" data-tip-trigger aria-label="${esc(t.top_performer_label)}: ${esc(desc)}" aria-expanded="false"><svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><circle cx="10" cy="10" r="8.25" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M7.9 7.7a2.15 2.15 0 1 1 3 2c-.6.3-.9.7-.9 1.3v.4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="10" cy="14.1" r=".95" fill="currentColor"/></svg></button><span class="prov-calc__tooltip ${C("top_performer_description")}" role="tooltip" data-tooltip>${esc(desc)}</span></span>`:"";
   const sheet=desc?`<div class="prov-calc__sheet" data-sheet hidden>
 <div class="prov-calc__sheet-backdrop" data-sheet-close></div>
 <div class="prov-calc__sheet-panel" role="dialog" aria-modal="true" data-sheet-panel>
@@ -60,46 +115,46 @@ function calcMarkup(t){
 <button class="prov-calc__sheet-x" type="button" data-sheet-close aria-label="${esc(t.tooltip_close||"Close")}"><svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
 <h4 class="prov-calc__sheet-title" data-sheet-title>${esc(t.top_performer_label)}</h4>
 <p class="prov-calc__sheet-text">${esc(desc)}</p>
-<button class="prov-calc__sheet-close" type="button" data-sheet-close>${esc(t.tooltip_close||"Close")}</button>
+<button class="prov-calc__sheet-close ${C("tooltip_close")}" type="button" data-sheet-close>${esc(t.tooltip_close||"Close")}</button>
 </div>
 </div>`:"";
   return `<div class="prov-calc__wrap">
 <header class="prov-calc__intro">
-<h2 class="prov-calc__title">${esc(t.title)}</h2>
-<p class="prov-calc__subtitle">${esc(t.subtitle)}</p>
+<${T("title")} class="prov-calc__title ${C("title")}">${esc(t.title)}</${T("title")}>
+<${T("subtitle")} class="prov-calc__subtitle ${C("subtitle")}">${esc(t.subtitle)}</${T("subtitle")}>
 </header>
 <div class="prov-calc__box">
 <div class="prov-calc__controls">
-<h3 class="prov-calc__question" data-question>${esc(t.client_question)}</h3>
+<${T("client_question")} class="prov-calc__question ${C("client_question")}" data-question>${esc(t.client_question)}</${T("client_question")}>
 <div class="prov-calc__slider-row">
 <button class="prov-calc__step" type="button" data-step="minus" aria-label="−"><span aria-hidden="true">-</span></button>
 <input class="prov-calc__range" type="range" min="0" max="0" value="0" step="1" data-range aria-label="${esc(t.client_question)}">
 <button class="prov-calc__step" type="button" data-step="plus" aria-label="+"><span aria-hidden="true">+</span></button>
 </div>
-<div class="prov-calc__scale"><span>${esc(t.slider_min_label)}</span><span>${esc(t.slider_max_label)}</span></div>
+<div class="prov-calc__scale"><span class="${C("slider_min_label")}">${esc(t.slider_min_label)}</span><span class="${C("slider_max_label")}">${esc(t.slider_max_label)}</span></div>
 <dl class="prov-calc__stats">
-<div class="prov-calc__stat"><dt>${esc(t.clients_label)}</dt><dd data-clients></dd></div>
-<div class="prov-calc__stat"><dt>${esc(t.time_label)}</dt><dd data-time></dd></div>
+<div class="prov-calc__stat"><dt class="${C("clients_label")}">${esc(t.clients_label)}</dt><dd data-clients></dd></div>
+<div class="prov-calc__stat"><dt class="${C("time_label")}">${esc(t.time_label)}</dt><dd data-time></dd></div>
 </dl>
 </div>
 <div class="prov-calc__result">
-<div class="prov-calc__badge">${esc(t.badge)}</div>
+<div class="prov-calc__badge ${C("badge")}">${esc(t.badge)}</div>
 <div class="prov-calc__card">
-<div class="prov-calc__card-head"><span class="prov-calc__card-title">${esc(t.commission_title)}</span><span data-time></span></div>
+<div class="prov-calc__card-head"><${T("commission_title")} class="prov-calc__card-title ${C("commission_title")}">${esc(t.commission_title)}</${T("commission_title")}><span data-time></span></div>
 <div class="prov-calc__card-body">
 <div class="prov-calc__amounts" aria-live="polite">
-<div class="prov-calc__amount prov-calc__amount--main"><span>${esc(t.monthly_commission)}</span><strong data-commission></strong></div>
-<div class="prov-calc__amount prov-calc__amount--top"><span class="prov-calc__amount-label">${esc(t.top_performer_label)}${tip}</span><strong data-top></strong></div>
+<div class="prov-calc__amount prov-calc__amount--main"><span class="${C("monthly_commission")}">${esc(t.monthly_commission)}</span><strong data-commission></strong></div>
+<div class="prov-calc__amount prov-calc__amount--top"><span class="prov-calc__amount-label ${C("top_performer_label")}">${esc(t.top_performer_label)}${tip}</span><strong data-top></strong></div>
 </div>
-<ul class="prov-calc__benefits prov-calc__benefits--card" data-benefits></ul>
-<a class="prov-calc__cta" href="${esc(t.cta_url||"#")}" target="${esc(t.cta_target||"_blank")}" rel="noopener">${esc(t.cta_text)}</a>
+<ul class="prov-calc__benefits prov-calc__benefits--card ${C("benefits_items")}" data-benefits></ul>
+<a class="prov-calc__cta ${C("cta_text")}" href="${esc(t.cta_url||"#")}" target="${esc(t.cta_target||"_blank")}" rel="noopener">${esc(t.cta_text)}</a>
 </div>
 </div>
 </div>
-<p class="prov-calc__note">${esc(t.note)}</p>
+<${T("note")} class="prov-calc__note ${C("note")}">${esc(t.note)}</${T("note")}>
 <div class="prov-calc__more" data-benefits-block>
-<h4 class="prov-calc__more-title">${esc(t.benefits_title||"What else you get")}</h4>
-<ul class="prov-calc__benefits prov-calc__benefits--list" data-benefits></ul>
+<${T("benefits_title")} class="prov-calc__more-title ${C("benefits_title")}">${esc(t.benefits_title||"What else you get")}</${T("benefits_title")}>
+<ul class="prov-calc__benefits prov-calc__benefits--list ${C("benefits_items")}" data-benefits></ul>
 </div>
 </div>
 ${sheet}
@@ -191,7 +246,7 @@ function provCalcRuntime(root, cfg){
    Breakpoint uses a container query, so the calculator adapts
    to the width of the CMS column it is placed in.
    ========================================================= */
-const CSS = `/* Provident commission calculator - generated CSS */
+const BASE_CSS = `/* Provident commission calculator - generated CSS */
 .prov-calc{
   --pc-blue:#0063E8;--pc-blue-hover:#0053C4;--pc-blue-pressed:#0045A3;
   --pc-black:#1A1A1A;--pc-text-2:#4A4A4C;--pc-border:#D3D3D3;--pc-divider:#F3F3F3;--pc-track:#D3D3D3;
@@ -203,6 +258,8 @@ const CSS = `/* Provident commission calculator - generated CSS */
   -webkit-font-smoothing:antialiased;
 }
 .prov-calc *,.prov-calc *::before,.prov-calc *::after{box-sizing:border-box}
+/* Neutralise CMS heading/paragraph styles (zero specificity, component rules win) */
+.prov-calc :where(h1,h2,h3,h4,h5,h6,p){color:inherit;text-transform:none;letter-spacing:0}
 .prov-calc__wrap{width:100%;max-width:1280px;margin:0 auto}
 
 /* Intro */
@@ -365,12 +422,32 @@ const CSS = `/* Provident commission calculator - generated CSS */
   .prov-calc__benefits--list{display:grid;gap:10px;font-size:14px}
 }
 @media (prefers-reduced-motion:reduce){.prov-calc *{transition:none!important}}
+.prov-calc__card-title{margin:0}
 `;
+
+/* Typography classes generated from TYPE_SCALE.
+   Heading styles use the Teamtailor heading font (Branding) via
+   --company-header-font-family; body styles use Nunito.
+   Sizes must live in the CSS - Teamtailor only provides the font. */
+function buildTypeCss(){
+  const ff={heading:"var(--company-header-font-family,'Nunito'),'Nunito',Arial,sans-serif",body:"'Nunito',Arial,sans-serif"};
+  let css="\n/* Typography - Provident type scale (desktop) */\n";
+  let mob="";
+  Object.entries(TYPE_SCALE).forEach(([k,v])=>{
+    css+=`.prov-calc .pc-type-${k}{font-family:${ff[v.font]};font-size:${v.size}px;line-height:${v.lh};letter-spacing:${v.caps?".04em":"0"};${v.caps?"text-transform:uppercase;":""}${v.font==="heading"?"font-weight:600;":""}}\n`;
+    if(v.m)mob+=`  .prov-calc .pc-type-${k}{font-size:${v.m}px;line-height:${v.mlh}}\n`;
+  });
+  WEIGHTS.forEach(([w])=>{css+=`.prov-calc .pc-w-${w}{font-weight:${w}}\n`;});
+  css+=`/* Typography - mobile web sizes */\n@container provcalc (max-width:799px){\n${mob}}\n`;
+  return css;
+}
+const CSS = BASE_CSS + buildTypeCss();
 
 function buildTextEditor(){
   const wrap=q("#textFields");
   wrap.innerHTML="";
   TEXT_FIELDS.forEach(([key,label,multi])=>{
+    const box=document.createElement("div");box.className="text-field";
     const l=document.createElement("label");
     l.textContent=label;
     const el=document.createElement(multi?"textarea":"input");
@@ -378,8 +455,38 @@ function buildTextEditor(){
     el.value=state.texts[key]||"";
     el.addEventListener("input",()=>{state.texts[key]=el.value;renderPreview();});
     l.appendChild(el);
-    wrap.appendChild(l);
+    box.appendChild(l);
+    if(DEFAULT_STYLES[key])box.appendChild(styleControls(key));
+    wrap.appendChild(box);
   });
+}
+
+/* Style row: text style (H1–H6 / P) + weight, shown under each text field. */
+function styleControls(key){
+  const row=document.createElement("div");row.className="style-row";
+  const cur=styleFor(state.styles,key);
+  const typeSel=document.createElement("select");typeSel.className="style-select";typeSel.setAttribute("aria-label","Text style");
+  Object.entries(TYPE_SCALE).forEach(([k,v])=>{
+    const o=document.createElement("option");o.value=k;
+    o.textContent=v.m?`${v.label} (${v.size} / ${v.m} px)`:`${v.label} (${v.size} px)`;
+    typeSel.appendChild(o);
+  });
+  typeSel.value=cur.type;
+  const wSel=document.createElement("select");wSel.className="style-select style-weight";wSel.setAttribute("aria-label","Font weight");
+  WEIGHTS.forEach(([w,n])=>{const o=document.createElement("option");o.value=w;o.textContent=n;wSel.appendChild(o);});
+  wSel.value=cur.weight;
+  const info=document.createElement("span");info.className="style-info";
+  function sync(){
+    const x=styleFor(state.styles,key), h=isHeading(x.type), sc=TYPE_SCALE[x.type];
+    wSel.disabled=h;wSel.value=x.weight;
+    const tag=TAG_FIELDS.has(key)?`<${h?x.type:"p"}>`:"style only";
+    info.textContent=`${tag} · ${h?"Branding Semibold":"Nunito"} · ${sc.m?sc.size+" / "+sc.m:sc.size} px`;
+  }
+  typeSel.addEventListener("change",()=>{state.styles[key]={...styleFor(state.styles,key),type:typeSel.value};sync();renderPreview();});
+  wSel.addEventListener("change",()=>{state.styles[key]={...styleFor(state.styles,key),weight:+wSel.value};sync();renderPreview();});
+  sync();
+  row.append(typeSel,wSel,info);
+  return row;
 }
 
 function renderTiers(){
@@ -412,6 +519,8 @@ function renderTiers(){
 function renderBenefits(){
   const wrap=q("#benefitsList");
   wrap.innerHTML="";
+  const st=q("#benefitsStyle");
+  if(st){st.innerHTML="";const lab=document.createElement("div");lab.className="style-caption";lab.textContent="Benefit text style";st.append(lab,styleControls("benefits_items"));}
   state.benefits.forEach((b,i)=>{
     const row=document.createElement("div");row.className="benefit-row";
     const input=document.createElement("input");input.value=b;input.dataset.i=i;
@@ -435,7 +544,7 @@ function renderPreview(reset=false){
   previewIndex=Math.min(previewIndex,Math.max(0,state.tiers.length-1));
   q("#previewMeta").textContent=`${state.locale} · ${state.currency}`;
   const root=q("#previewCalc");
-  root.innerHTML=calcMarkup(state.texts);
+  root.innerHTML=calcMarkup(state.texts,state.styles);
   root.querySelector(".prov-calc__cta").addEventListener("click",e=>e.preventDefault());
   provCalcRuntime(root,{tiers:state.tiers,benefits:state.benefits.filter(Boolean),locale:state.locale,currency:state.currency,index:previewIndex});
   fitPreview();
@@ -474,7 +583,7 @@ window.addEventListener("resize",fitPreview);
 window.addEventListener("load",()=>requestAnimationFrame(fitPreview));
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(fitPreview);
 
-function setPreset(code){state=clone(PRESETS[code]);renderEditor();renderPreview(true);}
+function setPreset(code){const styles=state.styles;state=clone(PRESETS[code]);state.styles=styles||clone(DEFAULT_STYLES);renderEditor();renderPreview(true);}
 function addTier(){
   const last=state.tiers[state.tiers.length-1], r=parseRange(last?.range||"0–10"), start=r.max+1;
   state.tiers.push({range:`${start}–${start+20}`,time:"",commission:0,top:0});renderTiers();renderPreview();
@@ -483,7 +592,7 @@ function addBenefit(){state.benefits.push("");renderBenefits();renderPreview();c
 function setStatus(s){q("#status").textContent=s;}
 
 function config(){
-  return {version:3,country:q("#country").value,locale:state.locale,currency:state.currency,xlsxFilename:state.xlsxFilename,texts:state.texts,tiers:state.tiers,benefits:state.benefits};
+  return {version:3,country:q("#country").value,locale:state.locale,currency:state.currency,xlsxFilename:state.xlsxFilename,texts:state.texts,styles:state.styles,tiers:state.tiers,benefits:state.benefits};
 }
 
 function makeXlsx(){
@@ -503,7 +612,7 @@ function makeHtml(){
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
-${calcMarkup(state.texts)}
+${calcMarkup(state.texts,state.styles)}
 <script>
 (function(){
 var DATA_URL='PASTE_PUBLIC_XLSX_URL_HERE';
@@ -555,7 +664,7 @@ q("#configFileInput").addEventListener("change",async e=>{
   const f=e.target.files[0];if(!f)return;
   try{
     const x=JSON.parse(await f.text());
-    state={locale:x.locale||"en-GB",currency:x.currency||"EUR",xlsxFilename:x.xlsxFilename||"Calculator_Data.xlsx",texts:x.texts||{},tiers:x.tiers||[],benefits:x.benefits||[]};
+    state={locale:x.locale||"en-GB",currency:x.currency||"EUR",xlsxFilename:x.xlsxFilename||"Calculator_Data.xlsx",texts:x.texts||{},tiers:x.tiers||[],benefits:x.benefits||[],styles:{...clone(DEFAULT_STYLES),...(x.styles||{})}};
     q("#country").value=x.country||"EN";renderEditor();renderPreview(true);setStatus("Configuration imported.");
   }catch(err){setStatus("Invalid configuration file.");}
 });

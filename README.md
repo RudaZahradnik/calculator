@@ -401,3 +401,42 @@ Vzhled kalkulačky byl kompletně přestavěn podle nových návrhů (Layout 144
 
 - Badge „Orientační výpočet“ je protažený směrem dolů a schovaný za kartou (karta má vyšší z-index a bílé pozadí). Zaoblený roh karty tak už nenechává trčet ostrý roh badge; badge a karta působí jako jeden spojený prvek na desktopu i mobilu.
 - Mobilní Live Preview: náhled se už neroztahuje na výšku rámečku, výška se počítá ze skutečné výšky kalkulačky a spodní okraj má volné místo (24 px).
+
+## Version 40 - Typografie podle Provident type scale
+
+Každý text v **Content & translations** (a text benefitů v panelu **Benefits**) má pod polem dva výběry:
+
+1. **Styl textu**: H1–H6 nebo P (Body 24/20/18/16, Body Small 14, Label 12, Supportive 11, Small caps 14/11).
+2. **Řez písma** pro P styly: Regular / Semibold / Bold. Nadpisy H1–H6 jsou vždy Branding Semibold.
+
+Pod výběrem je vidět, jaký HTML tag se použije, jaké písmo a velikost (desktop / mobil).
+
+| Styl | Písmo | Desktop | Mobil |
+|---|---|---|---|
+| H1 Headline Large | Branding Semibold | 48 / 100 % | 28 / 108 % |
+| H2 Headline Regular | Branding Semibold | 40 / 108 % | 24 / 108 % |
+| H3 Headline Small | Branding Semibold | 32 / 108 % | 20 / 120 % |
+| H4 Title Large | Branding Semibold | 24 / 108 % | 18 / 112 % |
+| H5 Title Regular | Branding Semibold | 20 / 120 % | 16 / 120 % |
+| H6 Title Small | Branding Semibold | 18 / 112 % | 14 / 124 % |
+| Body 24 / 20 / 18 | Nunito | 120 % | stejné |
+| Body 16 | Nunito | 135 % | stejné |
+| Body Small 14 | Nunito | 138 % | stejné |
+| Label 12 / Supportive 11 | Nunito | 128 % | stejné |
+| Small caps 14 / 11 | Nunito, verzálky, 4 % prostrkání | 138 % / 128 % | stejné |
+
+**HTML tag vs. jen styl**
+- Nadpis, podtitulek, otázka, nadpis karty, nadpis benefitů a disclaimer mění i HTML tag (`<h1>`–`<h6>` nebo `<p>`).
+- Ostatní texty (popisky, badge, CTA, tooltip…) jsou uvnitř pevných prvků (tlačítko, odkaz, seznam), takže se mění jen jejich vzhled („style only“).
+
+**Teamtailor**
+- Nadpisové styly berou písmo z `--company-header-font-family` (Branding v Teamtailoru), body styly používají Nunito.
+- Velikosti, výšky řádků a řezy jsou uložené přímo ve vygenerovaném CSS (třídy `pc-type-*` a `pc-w-*`), včetně mobilních velikostí. Teamtailor tedy dodává jen písmo, velikosti řídí CSS kalkulačky.
+- Globální barvy a text-transform nadpisů z CMS jsou neutralizované, aby kalkulačka vypadala stejně jako v náhledu.
+
+**Ukládání**
+- Styly jsou součástí Export/Import configuration.
+- Při přepnutí trhu zůstávají zachované.
+- Do XLSX se neukládají, protože jsou pevně zapsané v HTML/CSS.
+
+**Oprava:** desktopový Live Preview už nemá zbytečné prázdné místo pod kalkulačkou.
